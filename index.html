@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirante do Sol Residence</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@600;700&family=Dancing+Script:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome & Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Azul Profundo */
+            --secondary: #d97706; /* Dourado/Sol */
+            --bg-light: #f8fafc;
+            --navy-blue: #1B3B5A;
+            --light-blue: #4FA3C8;
+            --orange: #F58E2E;
+            --text-gray: #555;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-light);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Mobile Menu Transition */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .accordion-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .accordion-content.active {
+            opacity: 1;
+        }
+
+        .photo-card img {
+            transition: transform 0.3s ease;
+        }
+        .photo-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Estilos da aplicação 2 */
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1.brand-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: var(--navy-blue);
+            line-height: 1.1;
+        }
+
+        .brand-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--navy-blue);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-selector label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: var(--orange);
+        }
+
+        input[type="date"] {
+            padding: 10px;
+            border: 2px solid var(--light-blue);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--navy-blue);
+            outline: none;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-report {
+            background-color: white;
+            border: 2px solid var(--navy-blue);
+            color: var(--navy-blue);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-report:hover {
+            background-color: var(--navy-blue);
+            color: white;
+        }
+
+        .areas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .area-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .area-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .area-card h3 {
+            color: var(--navy-blue);
+            margin-bottom: 10px;
+        }
+
+        .icon-bbq {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .area-card.available {
+            border-bottom: 5px solid var(--light-blue);
+        }
+        .area-card.available .icon-bbq { color: #ccc; } 
+        .area-card.available .status { background-color: #e0f7fa; color: var(--navy-blue); }
+        .area-card.available:hover .icon-bbq { color: var(--light-blue); }
+
+        .area-card.booked {
+            border-bottom: 5px solid var(--orange);
+            background-color: #fff4e6;
+        }
+        .area-card.booked .icon-bbq { color: var(--orange); }
+        .area-card.booked .status { background-color: var(--orange); color: white; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(27, 59, 90, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal h2 {
+            color: var(--orange);
+            margin-bottom: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+        }
+
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Montserrat', sans-serif; }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-confirm { background-color: var(--navy-blue); color: white; }
+        .btn-cancel { background-color: #e74c3c; color: white; }
+        .btn-close { background-color: transparent; color: var(--text-gray); margin-top: 5px; font-size: 0.9rem; text-decoration: underline; }
+
+        /* Estilos para o seletor de bloco/apartamento */
+        .selector-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+
+        .selector-card h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 10px;
+            background-color: #e7f5ff;
+            border: 1px solid #bce8f1;
+            border-radius: 6px;
+            color: #31708f;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 w-full z-50 glass-nav h-20 flex items-center justify-between px-4 shadow-sm">
+        <button id="menu-btn" class="p-2 text-slate-700 hover:text-blue-900 focus:outline-none">
+            <i data-lucide="menu" class="w-8 h-8"></i>
+        </button>
+        
+        <div class="logo-container">
+            <svg width="40" height="40" viewBox="0 0 100 50" style="margin-bottom: -8px;">
+                <path d="M10 50 A 40 40 0 0 1 90 50" fill="#F58E2E" /> 
+                <path d="M0 50 Q 25 30 50 50 T 100 50" fill="none" stroke="#1B3B5A" stroke-width="5" /> 
+            </svg>
+            <h1 class="brand-name text-2xl">Mirante do Sol</h1>
+            <div class="brand-subtitle text-xs">Residence</div>
+        </div>
+
+        <button class="p-2 text-slate-700 relative">
+            <i data-lucide="bell" class="w-6 h-6"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Sidebar Menu -->
+    <div id="mobile-menu" class="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl z-50 transform -translate-x-full flex flex-col">
+        <div class="h-16 flex items-center justify-between px-4 border-b bg-blue-900 text-white">
+            <span class="font-bold font-serif text-lg">Menu</span>
+            <button id="close-menu-btn" class="p-1"><i data-lucide="x"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <a href="#" onclick="navigateTo('home')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fas fa-home w-6"></i> Início</a>
+            <a href="#" onclick="navigateTo('regimento')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fas fa-book w-6"></i> Regimento Interno</a>
+            <a href="#" onclick="navigateTo('areas')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fas fa-swimming-pool w-6"></i> Áreas Comuns</a>
+            <a href="#" onclick="navigateTo('gallery')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fas fa-images w-6"></i> Galeria</a>
+            <a href="#" onclick="navigateTo('reservas')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fas fa-calendar-check w-6"></i> Reservas</a>
+            <a href="#" onclick="navigateTo('contacts')" class="block px-6 py-3 hover:bg-blue-50 text-slate-700 font-medium border-l-4 border-transparent hover:border-amber-500 transition"><i class="fab fa-whatsapp w-6"></i> Grupos & Contato</a>
+        </div>
+        <div class="p-4 bg-slate-50 text-xs text-center text-slate-400">
+            &copy; 2025 Mirante do Sol
+        </div>
+    </div>
+    
+    <!-- Overlay for menu -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden fade-in"></div>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="pt-24 px-4 md:max-w-3xl md:mx-auto min-h-screen">
+        
+        <!-- SECTION: HOME -->
+        <section id="home" class="fade-in block">
+            <!-- Welcome Header -->
+            <div class="bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl p-6 text-white mb-6 shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-blue-200 text-sm mb-1">Bem-vindo ao</p>
+                    <h2 class="text-2xl font-bold mb-2">Mirante do Sol Residence</h2>
+                    <p class="text-sm opacity-90">Acesse as normas, horários e informações do seu condomínio.</p>
+                </div>
+                <i class="fas fa-sun absolute -bottom-4 -right-4 text-8xl text-white opacity-10"></i>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-amber-500 pl-3">Acesso Rápido</h3>
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div onclick="navigateTo('areas')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition cursor-pointer">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Horários</span>
+                </div>
+                <div onclick="navigateTo('regimento')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition cursor-pointer">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Regras</span>
+                </div>
+                <div onclick="navigateTo('reservas')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition cursor-pointer">
+                    <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Reservas</span>
+                </div>
+                <div onclick="navigateTo('contacts')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition cursor-pointer">
+                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Grupos</span>
+                </div>
+            </div>
+
+            <!-- Notice Board -->
+            <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-amber-500 pl-3">Avisos Importantes</h3>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-amber-600 mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-amber-900 text-sm">Silêncio</h4>
+                        <p class="text-xs text-amber-800 mt-1">Lembramos que o horário de silêncio é das 22:00h às 07:00h. Evite ruídos excessivos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: REGIMENTO INTERNO -->
+        <section id="regimento" class="hidden fade-in pb-10">
+            <h2 class="text-2xl font-bold text-blue-900 mb-6">Regimento Interno</h2>
+            <p class="text-sm text-gray-500 mb-4">Baseado no documento atualizado de 2025.</p>
+            
+            <div id="rules-container" class="space-y-3">
+                <!-- Dynamically filled via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: AREAS COMUNS -->
+        <section id="areas" class="hidden fade-in pb-10">
+            <h2 class="text-2xl font-bold text-blue-900 mb-6">Áreas & Horários</h2>
+            <div class="grid gap-4" id="spaces-container">
+                <!-- Dynamically filled via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: GALLERY -->
+        <section id="gallery" class="hidden fade-in pb-10">
+            <h2 class="text-2xl font-bold text-blue-900 mb-2">Galeria</h2>
+            <p class="text-sm text-gray-500 mb-6">Fotos das áreas comuns do Mirante do Sol.</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Piscina">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Piscina</span>
+                    </div>
+                </div>
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Academia">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Academia</span>
+                    </div>
+                </div>
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1514533222793-295163a6bac6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Salão de Festas">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Salão de Festas</span>
+                    </div>
+                </div>
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1566669384747-178a977df1f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Parque">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Parquinho</span>
+                    </div>
+                </div>
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Churrasqueira">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Churrasqueira</span>
+                    </div>
+                </div>
+                <div class="photo-card rounded-lg overflow-hidden shadow-md h-40 relative group">
+                    <img src="https://images.unsplash.com/photo-1596516109370-29001ec75852?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" alt="Mercadinho">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <span class="text-white text-xs font-bold">Mini Mercado</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: RESERVAS -->
+        <section id="reservas" class="hidden fade-in pb-10">
+            <div class="logo-container mb-6">
+                <svg width="50" height="50" viewBox="0 0 100 50" style="margin-bottom: -10px;">
+                    <path d="M10 50 A 40 40 0 0 1 90 50" fill="#F58E2E" /> 
+                    <path d="M0 50 Q 25 30 50 50 T 100 50" fill="none" stroke="#1B3B5A" stroke-width="5" /> 
+                </svg>
+                <h1 class="brand-name">Mirante do Sol</h1>
+                <div class="brand-subtitle">Residence</div>
+            </div>
+
+            <div class="controls">
+                <h2 class="text-xl font-bold text-blue-900">Gerenciamento de Áreas Gourmet</h2>
+                <div class="date-selector">
+                    <label for="booking-date">Data:</label>
+                    <input type="date" id="booking-date">
+                </div>
+                
+                <div class="report-actions">
+                    <button class="btn-report" onclick="generatePDF()">
+                        <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                    </button>
+                    <button class="btn-report" onclick="generateTXT()">
+                        <i class="fa-solid fa-file-lines"></i> Baixar Texto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seletor de Bloco/Apartamento -->
+            <div class="selector-card">
+                <h3>Identificação do Morador</h3>
+                
+                <div class="form-group">
+                    <label for="resident-name">Nome do Responsável:</label>
+                    <input type="text" id="resident-name" required placeholder="Ex: João Silva">
+                </div>
+                
+                <div class="form-group">
+                    <label for="blocoSelect">Selecione o Bloco:</label>
+                    <select id="blocoSelect">
+                        <option value="" selected disabled>Escolha um bloco...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="aptoSelect">Selecione o Apartamento:</label>
+                    <select id="aptoSelect" disabled>
+                        <option value="">Selecione o bloco primeiro</option>
+                    </select>
+                </div>
+
+                <div id="mensagemFinal" class="result"></div>
+            </div>
+
+            <div class="areas-grid" id="areas-grid">
+                <!-- Dynamically filled via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: CONTACTS -->
+        <section id="contacts" class="hidden fade-in pb-10">
+            <h2 class="text-2xl font-bold text-blue-900 mb-6">Conecte-se</h2>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6 text-center border border-gray-100">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fab fa-whatsapp text-3xl text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Grupo de Moradores</h3>
+                <p class="text-sm text-gray-500 mb-4">Fique por dentro dos avisos e interaja com seus vizinhos.</p>
+                <button class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg active:bg-green-700 transition">
+                    Entrar no Grupo
+                </button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6 text-center border border-gray-100">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-shield text-3xl text-blue-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Administração / Portaria</h3>
+                <p class="text-sm text-gray-500 mb-4">Contato direto para emergências e reservas.</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="tel:123456789" class="flex items-center justify-center gap-2 bg-slate-100 py-2 rounded text-slate-700 font-semibold text-sm">
+                        <i class="fas fa-phone"></i> Portaria
+                    </a>
+                    <a href="mailto:admin@mirante.com" class="flex items-center justify-center gap-2 bg-slate-100 py-2 rounded text-slate-700 font-semibold text-sm">
+                        <i class="fas fa-envelope"></i> E-mail
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4 mt-8">
+                <a href="#" class="text-gray-400 hover:text-blue-600 text-2xl"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-blue-600 text-2xl"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-gray-400 hover:text-blue-600 text-2xl"><i class="fas fa-globe"></i></a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modals for Reservations -->
+    <div class="modal-overlay" id="modal-booking">
+        <div class="modal">
+            <h2 id="modal-title">Reservar Área</h2>
+            <p id="modal-subtitle" style="margin-bottom: 20px;">Área Gourmet</p>
+            
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="modal-resident-name">Nome do Responsável:</label>
+                    <input type="text" id="modal-resident-name" required placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label for="modal-apartment">Torre / Apartamento:</label>
+                    <input type="text" id="modal-apartment" required placeholder="Ex: Bloco A - 302">
+                </div>
+                <button type="submit" class="btn btn-confirm">Confirmar Reserva</button>
+            </form>
+            <button class="btn btn-close" onclick="closeModal()">Fechar</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-info">
+        <div class="modal">
+            <h2>Detalhes da Reserva</h2>
+            <div style="text-align: left; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border-radius: 10px;">
+                <p><strong>Área:</strong> <span id="info-area"></span></p>
+                <p><strong>Responsável:</strong> <span id="info-name"></span></p>
+                <p><strong>Unidade:</strong> <span id="info-apt"></span></p>
+            </div>
+            <button onclick="cancelBooking()" class="btn btn-cancel">Cancelar Reserva</button>
+            <button class="btn btn-close" onclick="closeInfoModal()">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Bottom Tab Bar (Mobile Only) -->
+    <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden z-30">
+        <button onclick="navigateTo('home')" class="flex flex-col items-center text-blue-900 tab-btn active" data-target="home">
+            <i class="fas fa-home text-lg mb-1"></i>
+            <span class="text-[10px]">Início</span>
+        </button>
+        <button onclick="navigateTo('areas')" class="flex flex-col items-center text-gray-400 hover:text-blue-900 tab-btn" data-target="areas">
+            <i class="fas fa-building text-lg mb-1"></i>
+            <span class="text-[10px]">Áreas</span>
+        </button>
+        <div class="relative -top-5">
+            <button onclick="navigateTo('reservas')" class="bg-amber-500 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-105 transition">
+                <i class="fas fa-plus text-xl"></i>
+            </button>
+        </div>
+        <button onclick="navigateTo('regimento')" class="flex flex-col items-center text-gray-400 hover:text-blue-900 tab-btn" data-target="regimento">
+            <i class="fas fa-book text-lg mb-1"></i>
+            <span class="text-[10px]">Regras</span>
+        </button>
+        <button onclick="navigateTo('gallery')" class="flex flex-col items-center text-gray-400 hover:text-blue-900 tab-btn" data-target="gallery">
+            <i class="fas fa-images text-lg mb-1"></i>
+            <span class="text-[10px]">Fotos</span>
+        </button>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // DATA: Rules extracted from PDF
+        const rulesData = [
+            {
+                title: "Silêncio e Sossego",
+                icon: "volume-x",
+                content: "É proibido perturbar o sossego alheio com sons excessivos, gritarias ou obras fora de hora. O horário de silêncio é das 22h às 07h. Proibido som automotivo nas garagens."
+            },
+            {
+                title: "Mudanças e Reformas",
+                icon: "truck",
+                content: "<ul class='list-disc pl-4 text-sm space-y-1'><li><strong>Mudanções:</strong> Seg a Sex (08h-12h / 13h-18h), Sáb (08h-14h). Proibido domingos e feriados.</li><li><strong>Obras:</strong> Seg a Sex (08h-17h). Necessário autorização prévia do síndico.</li><li>Aviso prévio de 2 dias úteis para mudanças.</li></ul>"
+            },
+            {
+                title: "Animais Domésticos",
+                icon: "dog",
+                content: "Permitida a criação de animais. Nas áreas comuns, devem transitar sempre com guia e coleira ou no colo. Proibida a permanência de animais no salão de festas, piscina, churrasqueira e parque. O dono é responsável pela limpeza dos dejetos."
+            },
+            {
+                title: "Vagas de Garagem",
+                icon: "car",
+                content: "Uma vaga por unidade. Proibido usar como depósito. Velocidade máxima de 10km/h. Proibido lavar carros nas vagas. Visitantes só podem estacionar se houver vagas disponíveis não requisitadas."
+            },
+            {
+                title: "Lixo e Limpeza",
+                icon: "trash-2",
+                content: "O lixo deve estar em sacos resistentes e vedados, depositados nas bombonas/depósito. Proibido deixar lixo no hall ou portas. Se houver coleta seletiva, respeitar a separação."
+            },
+            {
+                title: "Áreas Comuns (Geral)",
+                icon: "users",
+                content: "Proibido transitar com trajes de banho (molhados e sem camisa) nos halls e elevadores. Crianças até 12 anos não podem ficar desacompanhadas nas áreas comuns."
+            }
+        ];
+
+        // DATA: Common Areas extracted from PDF
+        const spacesData = [
+            {
+                name: "Salão de Festas",
+                status: "Reserva Necessária",
+                statusColor: "text-orange-600 bg-orange-100",
+                hours: "06h às 23h",
+                rules: "Taxa de R$ 30,00. Limite 80 pessoas. Limpeza por conta do morador até as 10h do dia seguinte. Proibido som acima do permitido.",
+                img: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=100"
+            },
+            {
+                name: "Piscina",
+                status: "Aberto",
+                statusColor: "text-green-600 bg-green-100",
+                hours: "05h às 22h",
+                rules: "Fechada às terças-feiras para manutenção. Proibido som, vidro e alimentos na borda. Visitantes: até 5 por apto (Seg-Sáb) e 3 (Dom/Fer).",
+                img: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=100"
+            },
+            {
+                name: "Academia",
+                status: "Aberto",
+                statusColor: "text-green-600 bg-green-100",
+                hours: "24h (Seg-Dom)",
+                rules: "Acesso via reconhecimento facial. Idade mínima 14 anos. Uso de tênis obrigatório. Proibido levar equipamentos para casa.",
+                img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=100"
+            },
+            {
+                name: "Churrasqueira",
+                status: "Reserva Necessária",
+                statusColor: "text-orange-600 bg-orange-100",
+                hours: "08h às 22h",
+                rules: "Taxa de R$ 20,00. Limite 12 pessoas. Responsável deve limpar a área (grelha, pia, chão) após o uso.",
+                img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=100"
+            },
+            {
+                name: "Salão de Jogos",
+                status: "Aberto",
+                statusColor: "text-green-600 bg-green-100",
+                hours: "08h às 22h",
+                rules: "Menores de 14 anos apenas acompanhados. Limite de 8 pessoas. Chaves retiradas na portaria por maiores de 18 anos.",
+                img: "https://images.unsplash.com/photo-1598556776374-37129345769c?auto=format&fit=crop&w=100"
+            },
+            {
+                name: "Mini Mercado / Redário",
+                status: "24 Horas",
+                statusColor: "text-blue-600 bg-blue-100",
+                hours: "24h / 08h às 20h",
+                rules: "Mercado: Honest market, proibido consumir antes de pagar. Redário: Proibido som, bebida alcoólica e fumar.",
+                img: "https://images.unsplash.com/photo-1596516109370-29001ec75852?auto=format&fit=crop&w=100"
+            }
+        ];
+
+        // --- LÓGICA DO SISTEMA DE RESERVAS ---
+        const totalAreas = 8;
+        let selectedDate = '';
+        let selectedAreaId = null;
+
+        const dateInput = document.getElementById('booking-date');
+        const gridContainer = document.getElementById('areas-grid');
+        const modalBooking = document.getElementById('modal-booking');
+        const modalInfo = document.getElementById('modal-info');
+        const bookingForm = document.getElementById('booking-form');
+
+        // Elementos do seletor de bloco/apartamento
+        const blocoSelect = document.getElementById('blocoSelect');
+        const aptoSelect = document.getElementById('aptoSelect');
+        const mensagemFinal = document.getElementById('mensagemFinal');
+        const residentNameInput = document.getElementById('resident-name');
+        const modalResidentNameInput = document.getElementById('modal-resident-name');
+        const modalApartmentInput = document.getElementById('modal-apartment');
+
+        // Inicializar data com hoje
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        selectedDate = today;
+
+        // --- BANCO DE DADOS (LocalStorage) ---
+        function getBookings() {
+            const stored = localStorage.getItem('mirante_bookings');
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveBookings(data) {
+            localStorage.setItem('mirante_bookings', JSON.stringify(data));
+        }
+
+        // --- CONFIGURAÇÃO DO SELETOR DE BLOCO/APARTAMENTO ---
+        const totalBlocos = 23; 
+        
+        // Função para gerar a lista de apartamentos padrão
+        function gerarListaApartamentos() {
+            let lista = [];
+            for (let andar = 1; andar <= 4; andar++) {
+                for (let final = 1; final <= 8; final++) {
+                    let numeroApto = andar * 100 + final; 
+                    lista.push(numeroApto);
+                }
+            }
+            return lista;
+        }
+
+        const apartamentosPadrao = gerarListaApartamentos();
+
+        // Povoar o Select de Blocos
+        function inicializarSeletorBlocos() {
+            for (let i = 1; i <= totalBlocos; i++) {
+                let option = document.createElement('option');
+                let numeroFormatado = i < 10 ? '0' + i : i;
+                option.value = 'BL' + numeroFormatado;
+                option.text = 'Bloco ' + numeroFormatado;
+                blocoSelect.appendChild(option);
+            }
+        }
+
+        // Evento: Quando o usuário muda o Bloco
+        blocoSelect.addEventListener('change', function() {
+            const blocoSelecionado = this.value;
+
+            // Limpa as opções anteriores de apartamento
+            aptoSelect.innerHTML = '<option value="" selected disabled>Escolha o apartamento...</option>';
+            
+            // Habilita o select de apartamentos
+            aptoSelect.disabled = false;
+
+            // Povoa o select de apartamentos
+            apartamentosPadrao.forEach(apto => {
+                let option = document.createElement('option');
+                option.value = apto;
+                
+                // Detalhe extra baseado no PDF
+                let final = apto % 10;
+                let tipo = "";
+                
+                if([1, 4, 5, 8].includes(final)) {
+                    tipo = " (S/ Varanda)";
+                } else {
+                    tipo = " (C/ Varanda)";
+                }
+
+                option.text = `Apt ${apto}${tipo}`;
+                aptoSelect.appendChild(option);
+            });
+
+            // Reseta a mensagem final se mudar o bloco
+            mensagemFinal.style.display = 'none';
+        });
+
+        // Evento: Quando o usuário escolhe o Apartamento
+        aptoSelect.addEventListener('change', function() {
+            const bloco = blocoSelect.value;
+            const apto = this.value;
+            
+            if (bloco && apto) {
+                mensagemFinal.innerHTML = `Você selecionou: <strong>${bloco} - Apartamento ${apto}</strong>`;
+                mensagemFinal.style.display = 'block';
+                
+                // Preenche automaticamente o campo de apartamento no modal
+                modalApartmentInput.value = `${bloco} - Apt ${apto}`;
+            }
+        });
+
+        // Sincroniza o nome do responsável entre o formulário principal e o modal
+        residentNameInput.addEventListener('input', function() {
+            modalResidentNameInput.value = this.value;
+        });
+
+        // --- RENDERIZAÇÃO DAS RESERVAS ---
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+            const allBookings = getBookings();
+            const dateBookings = allBookings[selectedDate] || {};
+
+            for (let i = 1; i <= totalAreas; i++) {
+                const isBooked = dateBookings.hasOwnProperty(i);
+                
+                const card = document.createElement('div');
+                card.className = `area-card ${isBooked ? 'booked' : 'available'}`;
+                
+                // Lógica de Ícones com FontAwesome
+                let iconHTML = '';
+                if (isBooked) {
+                    iconHTML = '<i class="fa-solid fa-fire-burner icon-bbq"></i>'; // Churrasqueira ativa
+                } else {
+                    iconHTML = '<i class="fa-solid fa-utensils icon-bbq"></i>'; // Utensílios
+                }
+
+                card.innerHTML = `
+                    ${iconHTML}
+                    <h3>Área Gourmet ${i}</h3>
+                    <div class="status">${isBooked ? 'RESERVADO' : 'DISPONÍVEL'}</div>
+                `;
+
+                card.onclick = () => handleCardClick(i, isBooked, dateBookings[i]);
+                gridContainer.appendChild(card);
+            }
+        }
+
+        function handleCardClick(areaId, isBooked, bookingData) {
+            selectedAreaId = areaId;
+            if (isBooked) {
+                document.getElementById('info-area').innerText = `Área Gourmet ${areaId}`;
+                document.getElementById('info-name').innerText = bookingData.name;
+                document.getElementById('info-apt').innerText = bookingData.apt;
+                modalInfo.style.display = 'flex';
+            } else {
+                document.getElementById('modal-subtitle').innerText = `Área Gourmet ${areaId} - Data: ${formatDate(selectedDate)}`;
+                
+                // Preenche automaticamente os campos do modal com os dados do formulário principal
+                if (residentNameInput.value) {
+                    modalResidentNameInput.value = residentNameInput.value;
+                }
+                if (blocoSelect.value && aptoSelect.value) {
+                    modalApartmentInput.value = `${blocoSelect.value} - Apt ${aptoSelect.value}`;
+                }
+                
+                modalBooking.style.display = 'flex';
+            }
+        }
+
+        bookingForm.onsubmit = (e) => {
+            e.preventDefault();
+            const name = document.getElementById('modal-resident-name').value;
+            const apt = document.getElementById('modal-apartment').value;
+
+            if (name && apt) {
+                const allBookings = getBookings();
+                if (!allBookings[selectedDate]) allBookings[selectedDate] = {};
+
+                allBookings[selectedDate][selectedAreaId] = { name: name, apt: apt };
+                saveBookings(allBookings);
+                
+                alert(`Reserva confirmada para o ${name}!`);
+                closeModal();
+                renderGrid();
+            }
+        };
+
+        function cancelBooking() {
+            if(confirm("Tem certeza que deseja cancelar esta reserva?")) {
+                const allBookings = getBookings();
+                if (allBookings[selectedDate]) {
+                    delete allBookings[selectedDate][selectedAreaId];
+                    if (Object.keys(allBookings[selectedDate]).length === 0) delete allBookings[selectedDate];
+                    saveBookings(allBookings);
+                    alert("Reserva cancelada.");
+                    closeInfoModal();
+                    renderGrid();
+                }
+            }
+        }
+
+        // --- FUNÇÕES DE RELATÓRIO ---
+
+        // 1. Gerar Arquivo de Texto (.txt)
+        function generateTXT() {
+            const allBookings = getBookings();
+            const dayBookings = allBookings[selectedDate] || {};
+            
+            let content = `RELATÓRIO DE RESERVAS - ${formatDate(selectedDate)}\n`;
+            content += `----------------------------------------\n`;
+            
+            const keys = Object.keys(dayBookings);
+            if (keys.length === 0) {
+                content += "Nenhuma reserva para este dia.\n";
+            } else {
+                keys.forEach(areaId => {
+                    const b = dayBookings[areaId];
+                    content += `[Área ${areaId}] - ${b.name} (${b.apt})\n`;
+                });
+            }
+            content += `----------------------------------------\n`;
+            content += `Total de Reservas: ${keys.length}`;
+
+            // Criar blob e link de download
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reservas_${selectedDate}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // 2. Gerar PDF (.pdf)
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const allBookings = getBookings();
+            const dayBookings = allBookings[selectedDate] || {};
+
+            // Cabeçalho do PDF
+            doc.setFontSize(18);
+            doc.setTextColor(27, 59, 90); // Azul marinho
+            doc.text("Relatório de Ocupação", 105, 20, null, null, "center");
+            
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text(`Data: ${formatDate(selectedDate)}`, 105, 30, null, null, "center");
+
+            doc.setLineWidth(0.5);
+            doc.line(20, 35, 190, 35);
+
+            // Conteúdo
+            let yPos = 50;
+            const keys = Object.keys(dayBookings);
+
+            if (keys.length === 0) {
+                doc.text("Não há reservas registradas para esta data.", 20, yPos);
+            } else {
+                doc.setFontSize(10);
+                doc.setTextColor(0);
+                
+                // Cabeçalho da tabela simples
+                doc.setFont(undefined, 'bold');
+                doc.text("Área", 20, yPos);
+                doc.text("Responsável", 60, yPos);
+                doc.text("Unidade", 150, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += 10;
+
+                keys.forEach(areaId => {
+                    const b = dayBookings[areaId];
+                    doc.text(`Área Gourmet ${areaId}`, 20, yPos);
+                    doc.text(b.name, 60, yPos);
+                    doc.text(b.apt, 150, yPos);
+                    yPos += 10;
+                });
+            }
+
+            // Rodapé simples
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text("Gerado pelo sistema Mirante do Sol", 20, 280);
+
+            doc.save(`relatorio_${selectedDate}.pdf`);
+        }
+
+        // --- FUNÇÕES AUXILIARES DAS RESERVAS ---
+        function closeModal() { modalBooking.style.display = 'none'; }
+        function closeInfoModal() { modalInfo.style.display = 'none'; }
+        function formatDate(dateString) {
+            if(!dateString) return '';
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        // --- FUNÇÕES DA APLICAÇÃO PRINCIPAL ---
+        function renderRules() {
+            const container = document.getElementById('rules-container');
+            container.innerHTML = rulesData.map((rule, index) => `
+                <div class="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden">
+                    <button onclick="toggleAccordion(${index})" class="w-full flex items-center justify-between p-4 text-left focus:outline-none bg-white hover:bg-slate-50 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 text-blue-800 p-2 rounded-full">
+                                <i data-lucide="${rule.icon}" class="w-5 h-5"></i>
+                            </div>
+                            <span class="font-semibold text-slate-800">${rule.title}</span>
+                        </div>
+                        <i id="icon-${index}" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="content-${index}" class="accordion-content bg-slate-50 text-slate-600 text-sm px-4 border-t border-slate-100">
+                        <div class="py-3">${rule.content}</div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderSpaces() {
+            const container = document.getElementById('spaces-container');
+            container.innerHTML = spacesData.map(space => `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4">
+                    <img src="${space.img}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-gray-200" alt="${space.name}">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-800">${space.name}</h3>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full ${space.statusColor}">${space.status}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                            <i class="far fa-clock"></i> ${space.hours}
+                        </p>
+                        <p class="text-xs text-slate-600 leading-snug">${space.rules}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAccordion(index) {
+            const content = document.getElementById(`content-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0';
+                content.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                content.classList.add('active');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function navigateTo(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            
+            // Show target section
+            const target = document.getElementById(sectionId);
+            target.classList.remove('hidden');
+            
+            // Update Tab Bar Active State
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.dataset.target === sectionId) {
+                    btn.classList.add('text-blue-900');
+                    btn.classList.remove('text-gray-400');
+                } else {
+                    btn.classList.remove('text-blue-900');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+
+            // Close menu if open
+            closeMenu();
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // MENU LOGIC
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('menu-overlay');
+
+        function openMenu() {
+            mobileMenu.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRules();
+            renderSpaces();
+            renderGrid();
+            inicializarSeletorBlocos();
+            
+            // Start at home
+            navigateTo('home');
+        });
+
+        // Event listeners for reservations
+        dateInput.addEventListener('change', (e) => {
+            selectedDate = e.target.value;
+            renderGrid();
+        });
+
+        window.onclick = (e) => {
+            if (e.target == modalBooking) closeModal();
+            if (e.target == modalInfo) closeInfoModal();
+        }
+
+    </script>
+</body>
+</html>
